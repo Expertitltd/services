@@ -21,19 +21,9 @@ use \Bitrix\Sale\Fuser,
 class OrderActions
 {
     /**
-     * @var int|null
-     */
-    private $user;
-
-    /**
      * @var
      */
     private $basket;
-
-    /**
-     * @var
-     */
-    private $currentBasket;
 
     /**
      * @var \Bitrix\Sale\Order
@@ -55,39 +45,40 @@ class OrderActions
      */
     public $errors = [];
 
+    /**
+     * OrderActions constructor.
+     */
     public function __construct()
     {
         Loader::includeModule("sale");
         Loader::includeModule("catalog");
 
         $currentBasket = new BasketActions();
-        //$basket->getBasketList();
         $this->basket = $currentBasket->getBasket();
-
-        $this->order = Order::create(s1, 1);  //GetAnonymousUserID() - int(3)
+        $this->order = $this->createOrder();  //GetAnonymousUserID() - int(3)
     }
 
-    //$props = ["email" => "email@gmail.com"]
-
     /**
-     * @param $userId - передаем id пользователя
+     * @param int $userId
      */
-    public function createOrder($userId){
+    public function createOrder($userId = 0){
 
-        $siteId = Context::getCurrent()->getSite(); //"s1"
+        $userId = $userId ?: \CSaleUser::GetAnonymousUserID();
 
-        //var_dump($userId);
-        //var_dump($this->basket);
+        $siteId = Context::getCurrent()->getSite();
 
-        $this->order = Order::create($siteId, $userId);  //GetAnonymousUserID() - int(3)
+        $this->order = Order::create($siteId, $userId);
 
-        $currencyCode = Option::get('sale', 'default_currency', 'UAH'); //"UAH"
+        $currencyCode = CurrencyManager::getBaseCurrency();
         $this->order->setPersonTypeId(1);
         $this->order->setField('CURRENCY', $currencyCode);
 
         $this->order->setBasket($this->basket);
     }
 
+    /**
+     * @return mixed
+     */
     public function saveOrder(){
         $this->order->doFinalAction(true);
         $this->order->save();
@@ -97,7 +88,6 @@ class OrderActions
     }
 
     /**
-     * лучше $props!!! - дорлжно для всего подходить
      * @param string $email
      * @return mixed
      */
@@ -126,8 +116,6 @@ class OrderActions
 
         $userIdByEmail = $this->getUser($email);
 
-        //если пользователь не авторизован, то ищем по email,
-        //если не нашли - то GetAnonymousUserID
         if($USER->isAuthorized()) {
             $userId = $USER->GetID();
         }
@@ -144,19 +132,20 @@ class OrderActions
         $this->setPayment();
 
         // Устанавливаем свойства
-        /*$propertyCollection = $this->order->getPropertyCollection();
-        $phoneProp = $propertyCollection->getPhone();
-        $phoneProp->setValue($phone);
-        $nameProp = $propertyCollection->getPayerName();
-        $nameProp->setValue($name);*/
+        $propertyCollection = $this->order->getPropertyCollection();
+        $phoneProp = $propertyCollection->getUserEmail();
+        $phoneProp->setValue($email);
 
         $orderId = $this->saveOrder();
 
         return $orderId;
     }
 
-
     // Создаём одну отгрузку и устанавливаем способ доставки - "Без доставки" (он служебный)
+
+    /**
+     * @param null $serviceId
+     */
     public function setShipment($serviceId = null){
 
         $shipmentCollection = $this->order->getShipmentCollection();
@@ -182,10 +171,6 @@ class OrderActions
 
     }
 
-    public function getShipment(){
-        return $this->shipment;
-    }
-
     /**
      * @param $id
      */
@@ -199,31 +184,27 @@ class OrderActions
         ));
     }
 
-    public function getPayment(){
-        return $this->payment;
-    }
-
-    /*
-     * array $props = [
-     *      "EMAIL" => "",
-     *      "PHONE"
-     * ]
+    /**
+     * @param array $props
      */
     public function setProperties(array $props){
-
+        $propertyCollection = $this->order->getPropertyCollection();
+        foreach ($props as $id => $value) {
+            $somePropValue = $propertyCollection->getItemByOrderPropertyId($id);
+            $somePropValue->setValue($value);
+            $somePropValue->save();
+        }
     }
 
     //получить заказ по его id
+
+    /**
+     * @param $orderId
+     * @return mixed
+     */
     public function getOrderById($orderId){
         $order = Order::load($orderId);
         return $order;
     }
-
-/* if($USER->isAuthorized()){
-            $USER->GetID();
-        }else{
-
-        }
-*/
 
 }

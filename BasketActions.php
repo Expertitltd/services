@@ -43,6 +43,7 @@ class BasketActions
             $this->user,
             Context::getCurrent()->getSite()
         );
+        $this->basket->save();
     }
 
     /**
@@ -228,7 +229,6 @@ class BasketActions
             ];
 
         }
-        //var_dump($basketList);
 
         return $basketList;
     }
