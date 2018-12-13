@@ -1,6 +1,6 @@
 <?php
 
-namespace Expertit\Site;
+namespace Skalar\Auth;
 use Symfony\Component\Validator\Validation;
 
 use Symfony\Component\Validator\Constraints\Length;

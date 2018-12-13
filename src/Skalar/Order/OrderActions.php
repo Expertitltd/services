@@ -1,6 +1,6 @@
 <?php
 
-namespace Skalar;
+namespace Skalar\Basket;
 
 use \Bitrix\Sale\Fuser,
     \Bitrix\Sale\Order,
@@ -12,11 +12,11 @@ use \Bitrix\Sale\Fuser,
     \Bitrix\Currency\CurrencyManager,
     \Bitrix\Sale\PaySystem,
     \Bitrix\Main\UserTable,
-    \Skalar\BasketActions;
+    \Skalar\Basket\BasketActions;
 
 /**
  * Class OrderActions
- * @package Skalar
+ * @package Skalar\Basket
  */
 class OrderActions
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Expertit\Site;
+namespace Skalar\Auth;
 
 /**
  * Class Authorize
- * @package Skalar
+ * @package Skalar\Auth
  */
 class Authorize
 {

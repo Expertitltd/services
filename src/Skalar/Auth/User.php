@@ -1,15 +1,21 @@
 <?php
 
-namespace Expertit\Site;
+namespace Skalar\Auth;
 
 /**
- * Class UserService
- * @package Skalar
+ * Class User
+ * @package Skalar\Auth
  */
 class User
 {
+    /**
+     * @var
+     */
     protected $user;
 
+    /**
+     * @var Validator
+     */
     private $validator;
 
     /**

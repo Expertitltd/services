@@ -1,6 +1,6 @@
 <?php
 
-namespace Skalar;
+namespace Skalar\Basket;
 
 use \Bitrix\Sale\Fuser,
     \Bitrix\Sale\Basket,
@@ -11,7 +11,7 @@ use \Bitrix\Sale\Fuser,
 
 /**
  * Class BasketActions
- * @package Skalar
+ * @package Skalar\Basket
  */
 class BasketActions
 {

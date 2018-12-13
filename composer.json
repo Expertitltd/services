@@ -1,0 +1,32 @@
+{
+  "name": "skalar/services",
+  "description": "Services for bitrix",
+  "type": "library",
+  "keywords": [
+    "bitrix",
+    "services"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dmitry Skriplyonok",
+      "email": "dimaskriplyonok@gmail.com",
+      "homepage": "https://github.com/Expertitltd/services",
+      "role": "Developer"
+    },
+    {
+      "name": "Elena Drozdenko",
+      "role": "Developer"
+    }
+  ],
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.6.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "Skalar": "src"
+    }
+  }
+}

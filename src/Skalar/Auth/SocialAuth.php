@@ -1,17 +1,36 @@
 <?php
 
-namespace Expertit\Site;
+namespace Skalar\Auth;
 
 use OAuth\Common\Storage\Session;
 use OAuth\Common\Consumer\Credentials;
 
 
+/**
+ * Class SocialAuth
+ * @package Skalar\Auth
+ */
 class SocialAuth
 {
+    /**
+     * @var \OAuth\ServiceFactory
+     */
     private $serviceFactory;
+    /**
+     * @var Session
+     */
     private $storage;
+    /**
+     * @var
+     */
     private $currentUri;
+    /**
+     * @var
+     */
     private $socService;
+    /**
+     * @var
+     */
     private $seviceName;
 
     /**
@@ -55,6 +74,9 @@ class SocialAuth
         );
     }
 
+    /**
+     * @return mixed
+     */
     public function getRedirectUri(){
         return $this->currentUri->getAbsoluteUri();
     }
