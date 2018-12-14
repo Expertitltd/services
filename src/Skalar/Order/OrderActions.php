@@ -1,14 +1,11 @@
 <?php
 
-namespace Skalar\Basket;
+namespace Skalar\Order;
 
-use \Bitrix\Sale\Fuser,
-    \Bitrix\Sale\Order,
+use \Bitrix\Sale\Order,
     \Bitrix\Main\Context,
-    \Bitrix\Main\Config\Option,
     \Bitrix\Main\Loader,
     \Bitrix\Sale\Delivery,
-    \Bitrix\Sale\Basket,
     \Bitrix\Currency\CurrencyManager,
     \Bitrix\Sale\PaySystem,
     \Bitrix\Main\UserTable,
@@ -47,15 +44,16 @@ class OrderActions
 
     /**
      * OrderActions constructor.
+     * @param int $orderId
      */
-    public function __construct()
+    public function __construct($orderId = 0)
     {
         Loader::includeModule("sale");
         Loader::includeModule("catalog");
 
         $currentBasket = new BasketActions();
         $this->basket = $currentBasket->getBasket();
-        $this->order = $this->createOrder();  //GetAnonymousUserID() - int(3)
+        $this->setOrder($orderId);
     }
 
     /**
@@ -100,7 +98,6 @@ class OrderActions
             'limit' => 1
         ));
         while ($arUser = $result->fetch()) {
-            print_r($arUser);
             return $arUser["ID"];
         }
 
@@ -111,6 +108,11 @@ class OrderActions
      * @return int
      */
     public function quickOrder($email){
+
+        if (count($this->basket) == 0) {
+            $this->setErrors("No products in the cart");
+            return false;
+        }
 
         global $USER;
 
@@ -207,12 +209,24 @@ class OrderActions
         return $order;
     }
 
+    /**
+     * @param $orderId
+     */
     public function deleteOrder($orderId)
     {
         $result = Order::delete($orderId);
         if (!$result->isSuccess()) {
             $this->setErrors($result->getErrorMessages());
         }
+    }
+
+    /**
+     * @param int $orderId
+     */
+    public function setOrder($orderId = 0)
+    {
+        $orderId = intval($orderId);
+        $this->order = !empty($orderId) ? Order::load($orderId) : $this->createOrder();
     }
 
     /**
