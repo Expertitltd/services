@@ -22,7 +22,10 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.6.0"
+    "php": ">=5.6.0",
+    "symfony/validator": "^3.4",
+    "lusitanian/oauth": "^0.8.11",
+    "liqpay/liqpay": "^1.2"
   },
   "autoload": {
     "psr-0": {
