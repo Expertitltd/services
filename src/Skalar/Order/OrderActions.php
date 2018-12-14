@@ -198,7 +198,48 @@ class OrderActions
         }
     }
 
-    //получить заказ по его id
+    public function getOrderArray()
+    {
+        $result = [
+            "id" => $this->order->getId(),
+            "user" => $this->order->getUserId(),
+            "price" => $this->order->getPrice(),
+            "currency" => $this->order->getCurrency(),
+        ];
+
+        $payment = [];
+        $paymentCollection = $this->order->getPaymentCollection();
+        foreach ($paymentCollection as $paymentItem) {
+            $payment[] = [
+                "id" => $paymentItem->getPaymentSystemId(),
+                "name" => $paymentItem->getPaymentSystemName(),
+                "sum" => $paymentItem->getSum(),
+                "paid" => $paymentItem->isPaid(),
+            ];
+        }
+        $result["payment"] = $payment;
+
+        $shipment = [];
+        $shipmentCollection = $this->order->getShipmentCollection();
+        foreach ($shipmentCollection as $shipmentItem) {
+            $shipment[] = [
+                "id" => $shipmentItem->getId(),
+                "delivery" => $shipmentItem->getDeliveryId(),
+                "name" => $shipmentItem->getDeliveryName(),
+            ];
+        }
+        $result["shipment"] = $shipment;
+
+        $basketActions = new BasketActions();
+        $basketActions->setBasket($this->order->getBasket());
+        $result["basket"] = $basketActions->getBasketList();
+
+        $propertyCollection = $this->order->getPropertyCollection();
+        $arProps = $propertyCollection->getArray();
+        $result["properties"] = $arProps["properties"];
+
+        return $result;
+    }
 
     /**
      * @param $orderId
