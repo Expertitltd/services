@@ -157,7 +157,7 @@ class BasketActions
                 $props = [];
             }
 
-            if($product["customPrice"] !== null){
+            if(!empty($product["customPrice"])){
                 $customPrice = $product["customPrice"];
             }else{
                 $customPrice = null;

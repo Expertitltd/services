@@ -43,7 +43,7 @@ class OrderActions
     /**
      * @var array
      */
-    public $errors = [];
+    private $errors = [];
 
     /**
      * OrderActions constructor.
@@ -205,6 +205,34 @@ class OrderActions
     public function getOrderById($orderId){
         $order = Order::load($orderId);
         return $order;
+    }
+
+    public function deleteOrder($orderId)
+    {
+        $result = Order::delete($orderId);
+        if (!$result->isSuccess()) {
+            $this->setErrors($result->getErrorMessages());
+        }
+    }
+
+    /**
+     * @param $value
+     */
+    public function setErrors($value)
+    {
+        if(is_array($value)){
+            $this->errors = array_merge($this->errors, $value);
+        }else if(is_string($value)){
+            $this->errors[] = $value;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
 }
