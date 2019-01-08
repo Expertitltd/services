@@ -38,6 +38,10 @@ class ImageResizeService
      * @var string
      */
     private $fileNameJpg = '';
+    /**
+     * @var string
+     */
+    private $fileName = '';
 
     /**
      * ImageResizeService constructor.
@@ -47,11 +51,27 @@ class ImageResizeService
      */
     public function __construct($fileName, $height, $quality = 100)
     {
-        $this->image = new ImageResize($_SERVER['DOCUMENT_ROOT'] . $fileName);
+        $this->fileName = $fileName;
+        try {
+            $this->image = new ImageResize($_SERVER['DOCUMENT_ROOT'] . $fileName);
+        } catch (\Exception $e) {
+            $this->image = null;
+        }
         $this->height = $height;
         $this->quality = $quality;
         $this->resizeFileNameFolder = $this->getResizeImageFolder($fileName);
         $this->setResizeFileNames($fileName);
+    }
+
+    /**
+     * @param $fileId
+     * @param $height
+     * @param int $quality
+     * @return ImageResizeService
+     */
+    public static function createById($fileId, $height, $quality = 100)
+    {
+        return new ImageResizeService(\CFile::getPath($fileId), $height, $quality);
     }
 
     /**
@@ -84,6 +104,9 @@ class ImageResizeService
      */
     private function getSrc($imageType)
     {
+        if (empty($this->fileName)) {
+            return '';
+        }
         $resizeFileName = $this->resizeFileNameFolder . '/';
         switch ($imageType) {
             case IMAGETYPE_PNG:
@@ -136,13 +159,15 @@ class ImageResizeService
      */
     private function createCache($resizeFileName, $imageType, $useResize = true)
     {
-        if (!file_exists($this->resizeFileNameFolder)) {
-            mkdir($this->resizeFileNameFolder);
+        if ($this->image) {
+            if (!file_exists($this->resizeFileNameFolder)) {
+                mkdir($this->resizeFileNameFolder, 0775, true);
+            }
+            if ($useResize) {
+                $this->image->resizeToHeight($this->height);
+            }
+            $this->image->save($resizeFileName, $imageType, $this->quality);
         }
-        if ($useResize) {
-            $this->image->resizeToHeight($this->height);
-        }
-        $this->image->save($resizeFileName, $imageType, $this->quality);
     }
 
     /**
@@ -156,6 +181,7 @@ class ImageResizeService
             array_shift($arPath);
         }
         array_pop($arPath);
+        $arPath[] = $this->height . '_' . $this->quality;
         return $_SERVER['DOCUMENT_ROOT'] . '/upload/resize_cache/' . implode('/', $arPath);
     }
 
