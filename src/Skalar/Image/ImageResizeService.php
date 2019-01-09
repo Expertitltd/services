@@ -2,7 +2,7 @@
 
 namespace Skalar\Image;
 
-use Gumlet\ImageResize;
+use Skalar\Image\SkalarImageResize as ImageResize;
 
 /**
  * Class ImageResizeService
