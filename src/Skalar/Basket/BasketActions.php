@@ -113,14 +113,14 @@ class BasketActions
 
     /**
      * @param array $products = [
-     *                              [ 'id' => 'quantity', 6 => '10', '25' => '2',  ...],
+     *                              [ 'id' => 6, 'quantity' => 2],
      *                         ],
      */
     public function addProductsWithQuantity(array $products)
     {
-        foreach ($products as $key => $product){
-            $productId = $key;
-            $quantity = $product;
+        foreach ($products as $product){
+            $productId = $product['id'];
+            $quantity = $product['quantity'];
 
             $this->addToBasket($productId, $quantity);
         }
@@ -131,24 +131,32 @@ class BasketActions
      */
     public function addToBasketByIds(array $ids)
     {
-        $products = array_fill_keys( $ids, 1);
+        $products = [];
+        foreach ($ids as $id) {
+            $products[] = [
+                'id' => $id,
+                'quantity' => 1,
+            ];
+        }
         $this->addProductsWithQuantity($products);
     }
 
     /**
      * @param array $products = [
-     *                              id => [ 'quantity' => value,
+     *                              [
+     *                                      'id' => value,
+     *                                      'quantity' => value,
      *                                      'props' => [
-                                 *                        ['NAME' => 'Test prop', 'CODE' => 'TEST_PROP', 'VALUE' => 'test value', 'SORT' => 500],
-                                 *                      ],
+     *                        ['NAME' => 'Test prop', 'CODE' => 'TEST_PROP', 'VALUE' => 'test value', 'SORT' => 500],
+     *                      ],
      *                                      'customPrice' => "value"],
      *                         ],
      *
      */
     public function addProductAdvanced(array $products){
-        foreach ($products as $key => $product){
-            $productId = $key;
+        foreach ($products as $product){
 
+            $productId = $product['id'];
             $quantity = $product["quantity"];
 
             if(!empty($product["props"])){
@@ -208,25 +216,30 @@ class BasketActions
         $basketItems = $this->basket->getBasketItems();
 
         foreach ($basketItems as $item){
+
+            $basketPropertyCollection = $item->getPropertyCollection();
+            $property = $basketPropertyCollection->getPropertyValues();
+
             $basketList[$item->getId()] =
-            [
-                "id" => $item->getId(),
-                "product_id" => $item->getProductId(),
-                "name" => $item->getField('NAME'),
-                "fuser_id" => $item->getField('FUSER_ID'),
-                "order_id" => $item->getField('ORDER_ID'),
-                "price" => $item->getPrice(),
-                "custom_price" => $item->getField('CUSTOM_PRICE'),
-                "base_price" => $item->getField('BASE_PRICE'),
-                "currency" => $item->getField('BASE_PRICE'),
-                "quantity" => $item->getQuantity('CURRENCY'),
-                "final_price" => $item->getFinalPrice(),
-                "weight" => $item->getWeight(),
-                "can_buy" => $item->canBuy(),
-                "is_delay" => $item->isDelay(),
-                "date_insert" => $item->getField('DATE_INSERT'),
-                "date_update" => $item->getField('DATE_UPDATE'),
-            ];
+                [
+                    "id" => $item->getId(),
+                    "product_id" => $item->getProductId(),
+                    "name" => $item->getField('NAME'),
+                    "fuser_id" => $item->getField('FUSER_ID'),
+                    "order_id" => $item->getField('ORDER_ID'),
+                    "price" => $item->getPrice(),
+                    "custom_price" => $item->getField('CUSTOM_PRICE'),
+                    "base_price" => $item->getField('BASE_PRICE'),
+                    "currency" => $item->getField('BASE_PRICE'),
+                    "quantity" => $item->getQuantity('CURRENCY'),
+                    "final_price" => $item->getFinalPrice(),
+                    "weight" => $item->getWeight(),
+                    "can_buy" => $item->canBuy(),
+                    "is_delay" => $item->isDelay(),
+                    "date_insert" => $item->getField('DATE_INSERT'),
+                    "date_update" => $item->getField('DATE_UPDATE'),
+                    "property" => $property,
+                ];
 
         }
 
