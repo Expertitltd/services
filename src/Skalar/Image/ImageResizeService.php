@@ -11,10 +11,6 @@ use Skalar\Image\SkalarImageResize as ImageResize;
 class ImageResizeService
 {
     /**
-     * @var ImageResize
-     */
-    public $image;
-    /**
      * @var
      */
     private $height;
@@ -52,11 +48,6 @@ class ImageResizeService
     public function __construct($fileName, $height, $quality = 100)
     {
         $this->fileName = $fileName;
-        try {
-            $this->image = new ImageResize($_SERVER['DOCUMENT_ROOT'] . $fileName);
-        } catch (\Exception $e) {
-            $this->image = null;
-        }
         $this->height = $height;
         $this->quality = $quality;
         $this->resizeFileNameFolder = $this->getResizeImageFolder($fileName);
@@ -159,14 +150,15 @@ class ImageResizeService
      */
     private function createCache($resizeFileName, $imageType, $useResize = true)
     {
-        if ($this->image) {
+        $image = $this->getImage();
+        if ($image) {
             if (!file_exists($this->resizeFileNameFolder)) {
                 mkdir($this->resizeFileNameFolder, 0775, true);
             }
             if ($useResize) {
-                $this->image->resizeToHeight($this->height);
+                $image->resizeToHeight($this->height);
             }
-            $this->image->save($resizeFileName, $imageType, $this->quality);
+            $image->save($resizeFileName, $imageType, $this->quality);
         }
     }
 
@@ -204,5 +196,18 @@ class ImageResizeService
     private function getRelativeSrc($src)
     {
         return str_replace($_SERVER['DOCUMENT_ROOT'], '', $src);
+    }
+
+    /**
+     * @return null|SkalarImageResize
+     */
+    private function getImage()
+    {
+        try {
+            $image = new ImageResize($_SERVER['DOCUMENT_ROOT'] . $this->fileName);
+        } catch (\Exception $e) {
+            $image = null;
+        }
+        return $image;
     }
 }
