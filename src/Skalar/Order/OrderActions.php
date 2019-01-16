@@ -51,9 +51,14 @@ class OrderActions
         Loader::includeModule("sale");
         Loader::includeModule("catalog");
 
-        $currentBasket = new BasketActions();
-        $this->basket = $currentBasket->getBasket();
-        $this->setOrder($orderId);
+        if ($orderId) {
+            $this->setOrder($orderId);
+            $this->basket = $this->order->getBasket();
+        } else {
+            $currentBasket = new BasketActions();
+            $this->basket = $currentBasket->getBasket();
+            $this->setOrder($orderId);
+        }
     }
 
     /**
@@ -67,8 +72,9 @@ class OrderActions
 
         $this->order = Order::create($siteId, $userId);
 
-        $currencyCode = CurrencyManager::getBaseCurrency();
         $this->order->setPersonTypeId(1);
+
+        $currencyCode = CurrencyManager::getBaseCurrency();
         $this->order->setField('CURRENCY', $currencyCode);
 
         $this->order->setBasket($this->basket);
@@ -79,6 +85,7 @@ class OrderActions
      */
     public function saveOrder(){
         $this->order->doFinalAction(true);
+
         $this->order->save();
         $orderId = $this->order->getId();
 
@@ -107,7 +114,7 @@ class OrderActions
      * @param $email
      * @return int
      */
-    public function quickOrder($email){
+    public function quickOrderByEmail($email){
 
         if (count($this->basket) == 0) {
             $this->setErrors("No products in the cart");
@@ -133,7 +140,6 @@ class OrderActions
 
         $this->setPayment();
 
-        // Устанавливаем свойства
         $propertyCollection = $this->order->getPropertyCollection();
         $phoneProp = $propertyCollection->getUserEmail();
         $phoneProp->setValue($email);
@@ -142,8 +148,6 @@ class OrderActions
 
         return $orderId;
     }
-
-    // Создаём одну отгрузку и устанавливаем способ доставки - "Без доставки" (он служебный)
 
     /**
      * @param null $serviceId
@@ -194,7 +198,6 @@ class OrderActions
         foreach ($props as $id => $value) {
             $somePropValue = $propertyCollection->getItemByOrderPropertyId($id);
             $somePropValue->setValue($value);
-            $somePropValue->save();
         }
     }
 
